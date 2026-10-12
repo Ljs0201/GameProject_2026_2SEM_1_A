@@ -33,4 +33,10 @@ public class PickupItem : MonoBehaviour
         Debug.Log(itemName + " " + amount + "개 획득");
         Destroy(gameObject);
     }
+
+    // 외부(PlayerPickup 등)에서 아이템 이름을 가져갈 수 있도록 추가된 메서드[cite: 2]
+    public string GetItemName()
+    {
+        return itemName;
+    }
 }
