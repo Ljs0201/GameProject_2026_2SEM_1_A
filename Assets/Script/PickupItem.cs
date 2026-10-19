@@ -6,12 +6,19 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private string itemName = "아이템";
     [SerializeField] private int amount = 1;
 
+    [SerializeField] QuestManager questManager;
+
     [Header("화면 연출")]
     [SerializeField] private float rotationSpeed = 60f;
     [SerializeField] private float floatingHeight = 0.15f;
     [SerializeField] private float floatingSpeed = 2f;
 
     private Vector3 startPosition;
+
+    public void Awake()
+    {
+        questManager = FindFirstObjectByType<QuestManager>();
+    }
 
     void Start()
     {
@@ -31,10 +38,11 @@ public class PickupItem : MonoBehaviour
     public void Collect()
     {
         Debug.Log(itemName + " " + amount + "개 획득");
+        questManager.AddQuestItem(itemName, amount);
         Destroy(gameObject);
     }
 
-    // 외부(PlayerPickup 등)에서 아이템 이름을 가져갈 수 있도록 추가된 메서드[cite: 2]
+    // 외부(PlayerPickup 등)에서 아이템 이름을 가져갈 수 있도록 추가된 메서드
     public string GetItemName()
     {
         return itemName;
