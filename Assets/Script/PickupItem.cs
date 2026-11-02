@@ -6,6 +6,7 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private string itemName = "아이템";
     [SerializeField] private int amount = 1;
 
+    // (주의: QuestManager가 없다면 주석 처리)
     [SerializeField] QuestManager questManager;
 
     [Header("화면 연출")]
@@ -14,10 +15,12 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private float floatingSpeed = 2f;
 
     private Vector3 startPosition;
+    private SimpleInventory inventory;
 
     public void Awake()
     {
-        questManager = FindFirstObjectByType<QuestManager>();
+        // questManager = FindAnyObjectByType<QuestManager>(); // 필요시 주석 해제
+        inventory = FindAnyObjectByType<SimpleInventory>();
     }
 
     void Start()
@@ -27,22 +30,41 @@ public class PickupItem : MonoBehaviour
 
     void Update()
     {
-        //아이템을 천천히 회전 시킨다.
-        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+        // 아이템 회전 연출
+        transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
 
-        //아이템을 위아래로 움직인다.
-        float y = Mathf.Sin(Time.time * floatingSpeed) * floatingHeight;
-        transform.position = startPosition + Vector3.up * y;
+        // 아이템 위아래 둥둥 떠다니는 연출
+        float newY = startPosition.y + Mathf.Sin(Time.time * floatingSpeed) * floatingHeight;
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
     }
 
+    // 플레이어가 이 아이템을 주웠을 때 실행되는 함수
     public void Collect()
     {
+        if (inventory == null)
+        {
+            Debug.Log("SimpleInventory를 찾을 수 없습니다.");
+            return;
+        }
+
+        // 인벤토리가 꽉 차서 AddItem이 false를 반환하면 줍기 취소
+        if (inventory.AddItem(itemName, amount) == false)
+        {
+            return;
+        }
+
         Debug.Log(itemName + " " + amount + "개 획득");
-        questManager.AddQuestItem(itemName, amount);
+
+        if (questManager != null)
+        {
+            // questManager.AddQuestItem(itemName, amount); // 퀘스트 기능이 필요하면 주석 해제
+        }
+
+        // 아이템을 인벤토리에 넣었으므로 맵에서 삭제
         Destroy(gameObject);
     }
 
-    // 외부(PlayerPickup 등)에서 아이템 이름을 가져갈 수 있도록 추가된 메서드
+    // 💡 [추가된 부분] PlayerPickup에서 아이템 이름을 가져갈 수 있게 해주는 함수
     public string GetItemName()
     {
         return itemName;

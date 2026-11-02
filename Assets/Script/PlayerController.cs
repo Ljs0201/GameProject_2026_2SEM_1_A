@@ -5,6 +5,7 @@ public enum PlayerState
 {
     Normal,
     Pickup,
+    inventory // 이미지에 따라 추가된 상태[cite: 20]
 }
 
 public class PlayerController : MonoBehaviour
@@ -129,5 +130,11 @@ public class PlayerController : MonoBehaviour
         }
 
         Debug.Log("현재 상태 : " + currentState);
+    }
+
+    // 이미지에 따라 새롭게 추가된 함수[cite: 21]
+    public bool IsNormalState()
+    {
+        return currentState == PlayerState.Normal;
     }
 }
